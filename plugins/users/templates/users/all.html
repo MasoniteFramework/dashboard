@@ -1,0 +1,312 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}All Users{% endblock %}
+
+{% block page_title %}User Management{% endblock %}
+
+{% block breadcrumbs %}
+<nav class="flex mb-6" aria-label="Breadcrumb">
+    <ol class="inline-flex items-center space-x-1 md:space-x-3">
+        <li class="inline-flex items-center">
+            <a href="/dashboard" class="inline-flex items-center text-sm font-medium text-gray-700 hover:text-light-blue-600">
+                <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path>
+                </svg>
+                Dashboard
+            </a>
+        </li>
+        <li>
+            <div class="flex items-center">
+                <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                </svg>
+                <span class="ml-1 text-sm font-medium text-gray-500 md:ml-2">Users</span>
+            </div>
+        </li>
+        <li>
+            <div class="flex items-center">
+                <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                </svg>
+                <span class="ml-1 text-sm font-medium text-gray-500 md:ml-2">All Users</span>
+            </div>
+        </li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<!-- Header Section -->
+<div class="mb-8">
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-900">All Users</h1>
+            <p class="mt-1 text-sm text-gray-500">Manage and view all registered users in your system.</p>
+        </div>
+        <div class="flex space-x-3">
+            <!-- <button class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-light-blue-500">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+                Export
+            </button> -->
+            <!-- <a href="/dashboard/users/create" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-light-blue-600 hover:bg-light-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-light-blue-500">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                </svg>
+                Add User
+            </a> -->
+        </div>
+    </div>
+</div>
+
+<!-- Stats Cards -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+    <div class="bg-white overflow-hidden shadow rounded-lg">
+        <div class="p-5">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <div class="w-8 h-8 bg-light-blue-500 rounded-md flex items-center justify-center">
+                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
+                        </svg>
+                    </div>
+                </div>
+                <div class="ml-5 w-0 flex-1">
+                    <dl>
+                        <dt class="text-sm font-medium text-gray-500 truncate">Total Users</dt>
+                        <dd class="text-lg font-medium text-gray-900">{{ total }}</dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Search and Filter Bar -->
+<div class="bg-white shadow rounded-lg mb-6">
+    <div class="px-6 py-4 border-b border-gray-200">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0">
+            <div class="flex-1 min-w-0">
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                    </div>
+                    <input type="text" placeholder="Search users..." class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-light-blue-500 focus:border-light-blue-500">
+                </div>
+            </div>
+            <div class="flex space-x-3">
+                <!-- <select class="block w-full pl-3 pr-10 py-2 text-base border border-gray-300 focus:outline-none focus:ring-light-blue-500 focus:border-light-blue-500 sm:text-sm rounded-md">
+                    <option>All Status</option>
+                    <option>Active</option>
+                    <option>Inactive</option>
+                </select> -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Users Table -->
+<div class="bg-white shadow overflow-hidden sm:rounded-md">
+    <div class="px-4 py-5 sm:p-6">
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            User
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Role
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Status
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Last Login
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Created
+                        </th>
+                        <th scope="col" class="relative px-6 py-3">
+                            <span class="sr-only">Actions</span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for user in users %}
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0 h-10 w-10">
+                                    <div class="h-10 w-10 rounded-full bg-light-blue-500 flex items-center justify-center">
+                                        <span class="text-sm font-medium text-white">{{ user.name[0].upper() if user.name else 'U' }}</span>
+                                    </div>
+                                </div>
+                                <div class="ml-4">
+                                    <div class="text-sm font-medium text-gray-900">{{ user.name or 'No Name' }}</div>
+                                    <div class="text-sm text-gray-500">{{ user.email }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            {% if user.is_admin %}
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                                Admin
+                            </span>
+                            {% else %}
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                User
+                            </span>
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            {% if user.is_active %}
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                <svg class="w-1.5 h-1.5 mr-1" fill="currentColor" viewBox="0 0 8 8">
+                                    <circle cx="4" cy="4" r="3"/>
+                                </svg>
+                                Active
+                            </span>
+                            {% else %}
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                <svg class="w-1.5 h-1.5 mr-1" fill="currentColor" viewBox="0 0 8 8">
+                                    <circle cx="4" cy="4" r="3"/>
+                                </svg>
+                                Inactive
+                            </span>
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {{ user.last_login_at.strftime('%b %d, %Y') if user.last_login_at else 'Never' }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {{ user.created_at.strftime('%b %d, %Y') if user.created_at else 'Unknown' }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            <div class="flex items-center space-x-2">
+                                <a href="/dashboard/users/{{ user.id }}/edit" class="text-light-blue-600 hover:text-light-blue-900">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                    </svg>
+                                </a>
+                                <button onclick="confirmDelete({{ user.id }}, '{{ user.name or user.email }}')" class="text-red-600 hover:text-red-900">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Empty State -->
+        {% if not users %}
+        <div class="text-center py-12">
+            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
+            </svg>
+            <h3 class="mt-2 text-sm font-medium text-gray-900">No users</h3>
+            <p class="mt-1 text-sm text-gray-500">Get started by creating a new user.</p>
+            <!-- <div class="mt-6">
+                <a href="/dashboard/users/create" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-light-blue-600 hover:bg-light-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-light-blue-500">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                    </svg>
+                    Add User
+                </a>
+            </div> -->
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Pagination -->
+{% if users and users|length > 10 %}
+<div class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6 mt-6">
+    <div class="flex-1 flex justify-between sm:hidden">
+        <a href="#" class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+            Previous
+        </a>
+        <a href="#" class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+            Next
+        </a>
+    </div>
+    <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+        <div>
+            <p class="text-sm text-gray-700">
+                Showing <span class="font-medium">1</span> to <span class="font-medium">{{ users|length }}</span> of <span class="font-medium">{{ users|length }}</span> results
+            </p>
+        </div>
+        <div>
+            <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                <a href="#" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                    <span class="sr-only">Previous</span>
+                    <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+                    </svg>
+                </a>
+                <a href="#" class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">1</a>
+                <a href="#" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                    <span class="sr-only">Next</span>
+                    <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                    </svg>
+                </a>
+            </nav>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block js %}
+<script>
+function confirmDelete(userId, userName) {
+    if (confirm(`Are you sure you want to delete user "${userName}"? This action cannot be undone.`)) {
+        // Create a form and submit it
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = `/dashboard/users/${userId}/delete`;
+        
+        // Add CSRF token if available
+        const csrfToken = document.querySelector('meta[name="csrf-token"]');
+        if (csrfToken) {
+            const csrfInput = document.createElement('input');
+            csrfInput.type = 'hidden';
+            csrfInput.name = '_token';
+            csrfInput.value = csrfToken.getAttribute('content');
+            form.appendChild(csrfInput);
+        }
+        
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
+
+// Search functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.querySelector('input[placeholder="Search users..."]');
+    if (searchInput) {
+        searchInput.addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const rows = document.querySelectorAll('tbody tr');
+            
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                if (text.includes(searchTerm)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,261 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}Dashboard Home{% endblock %}
+
+{% block page_title %}Dashboard Overview{% endblock %}
+
+{% block breadcrumbs %}
+<nav class="flex mb-6" aria-label="Breadcrumb">
+    <ol class="inline-flex items-center space-x-1 md:space-x-3">
+        <li class="inline-flex items-center">
+            <a href="/dashboard" class="inline-flex items-center text-sm font-medium text-gray-700 hover:text-light-blue-600">
+                <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path>
+                </svg>
+                Dashboard
+            </a>
+        </li>
+        <li>
+            <div class="flex items-center">
+                <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                </svg>
+                <span class="ml-1 text-sm font-medium text-gray-500 md:ml-2">Overview</span>
+            </div>
+        </li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<!-- Stats Cards -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <div class="bg-white overflow-hidden shadow rounded-lg">
+        <div class="p-5">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <div class="w-8 h-8 bg-light-blue-500 rounded-md flex items-center justify-center">
+                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
+                        </svg>
+                    </div>
+                </div>
+                <div class="ml-5 w-0 flex-1">
+                    <dl>
+                        <dt class="text-sm font-medium text-gray-500 truncate">Total Users</dt>
+                        <dd class="text-lg font-medium text-gray-900">1,234</dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="bg-white overflow-hidden shadow rounded-lg">
+        <div class="p-5">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <div class="w-8 h-8 bg-green-500 rounded-md flex items-center justify-center">
+                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                        </svg>
+                    </div>
+                </div>
+                <div class="ml-5 w-0 flex-1">
+                    <dl>
+                        <dt class="text-sm font-medium text-gray-500 truncate">Revenue</dt>
+                        <dd class="text-lg font-medium text-gray-900">$45,678</dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="bg-white overflow-hidden shadow rounded-lg">
+        <div class="p-5">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <div class="w-8 h-8 bg-yellow-500 rounded-md flex items-center justify-center">
+                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                        </svg>
+                    </div>
+                </div>
+                <div class="ml-5 w-0 flex-1">
+                    <dl>
+                        <dt class="text-sm font-medium text-gray-500 truncate">Growth</dt>
+                        <dd class="text-lg font-medium text-gray-900">+12.5%</dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="bg-white overflow-hidden shadow rounded-lg">
+        <div class="p-5">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <div class="w-8 h-8 bg-purple-500 rounded-md flex items-center justify-center">
+                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5v-5zM4.828 7l2.586 2.586a2 2 0 002.828 0L12.828 7H4.828z"></path>
+                        </svg>
+                    </div>
+                </div>
+                <div class="ml-5 w-0 flex-1">
+                    <dl>
+                        <dt class="text-sm font-medium text-gray-500 truncate">Orders</dt>
+                        <dd class="text-lg font-medium text-gray-900">567</dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Main Content Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+    <!-- Recent Activity -->
+    <div class="bg-white shadow rounded-lg">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <h3 class="text-lg font-medium text-gray-900">Recent Activity</h3>
+        </div>
+        <div class="p-6">
+            <div class="flow-root">
+                <ul class="-mb-8">
+                    <li>
+                        <div class="relative pb-8">
+                            <span class="absolute top-4 left-4 -ml-px h-full w-0.5 bg-gray-200" aria-hidden="true"></span>
+                            <div class="relative flex space-x-3">
+                                <div>
+                                    <span class="h-8 w-8 rounded-full bg-light-blue-500 flex items-center justify-center ring-8 ring-white">
+                                        <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path>
+                                        </svg>
+                                    </span>
+                                </div>
+                                <div class="min-w-0 flex-1 pt-1.5 flex justify-between space-x-4">
+                                    <div>
+                                        <p class="text-sm text-gray-500">New user <span class="font-medium text-gray-900">John Doe</span> registered</p>
+                                    </div>
+                                    <div class="text-right text-sm whitespace-nowrap text-gray-500">
+                                        <time datetime="2023-01-15">2 hours ago</time>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="relative pb-8">
+                            <span class="absolute top-4 left-4 -ml-px h-full w-0.5 bg-gray-200" aria-hidden="true"></span>
+                            <div class="relative flex space-x-3">
+                                <div>
+                                    <span class="h-8 w-8 rounded-full bg-green-500 flex items-center justify-center ring-8 ring-white">
+                                        <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path>
+                                        </svg>
+                                    </span>
+                                </div>
+                                <div class="min-w-0 flex-1 pt-1.5 flex justify-between space-x-4">
+                                    <div>
+                                        <p class="text-sm text-gray-500">Order <span class="font-medium text-gray-900">#1234</span> completed</p>
+                                    </div>
+                                    <div class="text-right text-sm whitespace-nowrap text-gray-500">
+                                        <time datetime="2023-01-15">4 hours ago</time>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="relative">
+                            <div class="relative flex space-x-3">
+                                <div>
+                                    <span class="h-8 w-8 rounded-full bg-yellow-500 flex items-center justify-center ring-8 ring-white">
+                                        <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                                        </svg>
+                                    </span>
+                                </div>
+                                <div class="min-w-0 flex-1 pt-1.5 flex justify-between space-x-4">
+                                    <div>
+                                        <p class="text-sm text-gray-500">System maintenance scheduled</p>
+                                    </div>
+                                    <div class="text-right text-sm whitespace-nowrap text-gray-500">
+                                        <time datetime="2023-01-15">6 hours ago</time>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Quick Actions -->
+    <div class="bg-white shadow rounded-lg">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <h3 class="text-lg font-medium text-gray-900">Quick Actions</h3>
+        </div>
+        <div class="p-6">
+            <div class="grid grid-cols-2 gap-4">
+                <a href="/dashboard/users/invite" class="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-light-blue-50 hover:border-light-blue-300 transition-colors">
+                    <div class="flex-shrink-0">
+                        <div class="w-8 h-8 bg-light-blue-100 rounded-lg flex items-center justify-center">
+                            <svg class="w-5 h-5 text-light-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm font-medium text-gray-900">Invite User</p>
+                        <p class="text-xs text-gray-500">Add new team member</p>
+                    </div>
+                </a>
+                
+                <a href="/dashboard/analytics/reports" class="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-light-blue-50 hover:border-light-blue-300 transition-colors">
+                    <div class="flex-shrink-0">
+                        <div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                            <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm font-medium text-gray-900">View Reports</p>
+                        <p class="text-xs text-gray-500">Analytics dashboard</p>
+                    </div>
+                </a>
+                
+                <a href="/dashboard/settings/general" class="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-light-blue-50 hover:border-light-blue-300 transition-colors">
+                    <div class="flex-shrink-0">
+                        <div class="w-8 h-8 bg-yellow-100 rounded-lg flex items-center justify-center">
+                            <svg class="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm font-medium text-gray-900">Settings</p>
+                        <p class="text-xs text-gray-500">Configure system</p>
+                    </div>
+                </a>
+                
+                <a href="/dashboard/analytics/export" class="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-light-blue-50 hover:border-light-blue-300 transition-colors">
+                    <div class="flex-shrink-0">
+                        <div class="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
+                            <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm font-medium text-gray-900">Export Data</p>
+                        <p class="text-xs text-gray-500">Download reports</p>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
