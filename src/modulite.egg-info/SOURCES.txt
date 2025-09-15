@@ -1,0 +1,11 @@
+LICENSE
+MANIFEST.in
+README.md
+setup.cfg
+setup.py
+src/modulite.egg-info/PKG-INFO
+src/modulite.egg-info/SOURCES.txt
+src/modulite.egg-info/dependency_links.txt
+src/modulite.egg-info/requires.txt
+src/modulite.egg-info/top_level.txt
+tests/test_package.py

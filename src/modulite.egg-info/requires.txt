@@ -1,0 +1,11 @@
+masonite<5,>=4
+
+[dev]
+twine
+flake8
+black
+masonite-package-sync
+
+[test]
+coverage
+pytest
