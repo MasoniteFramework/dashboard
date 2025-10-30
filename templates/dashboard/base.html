@@ -134,6 +134,12 @@
                             </svg>
                         </div>
                         
+                        {% if auth() %}
+                        <div class="border-l h-6">{{ auth().email}}</div>
+                        {% else %}
+                        <div class="border-l h-6">Sign In</div>
+                        {% endif %}
+                        
                         <!-- Notifications -->
                         <button class="relative p-2 text-gray-500 hover:text-gray-600">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -141,6 +147,8 @@
                             </svg>
                             <span class="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-400"></span>
                         </button>
+
+
                         
                         <!-- Dark Mode Toggle -->
                         <button @click="darkMode = !darkMode" class="p-2 text-gray-500 hover:text-gray-600">

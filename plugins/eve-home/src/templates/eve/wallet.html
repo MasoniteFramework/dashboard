@@ -1,0 +1,530 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}{{ character.name }} - Wallet Transactions{% endblock %}
+
+{% block page_title %}
+EVE Wallet Transactions
+    {% if auth() %}
+    <a href="{{ '?character_id='+request().input('character_id')+'&refresh=1' if request().input('character_id') else '?refresh=1' }}" 
+       target="" 
+       class="inline-flex items-center">
+        
+        <button class="ml-2 px-3 py-1 bg-light-blue-600 text-white text-sm font-medium rounded hover:bg-light-blue-700 focus:outline-none focus:ring-2 focus:ring-light-blue-500">
+        <svg class="w-4 h-4 inline-block mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+        </svg>
+    {% else %}
+    please login
+    {%endif%}
+    Refresh Transactions
+</a>
+{% endblock %}
+
+{% block breadcrumbs %}
+<nav class="flex mb-6" aria-label="Breadcrumb">
+    <ol class="inline-flex items-center space-x-1 md:space-x-3">
+        <li class="inline-flex items-center">
+            <a href="/dashboard" class="inline-flex items-center text-sm font-medium text-gray-700 hover:text-light-blue-600">
+                <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path>
+                </svg>
+                Dashboard
+            </a>
+        </li>
+        <li>
+            <div class="flex items-center">
+                <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                </svg>
+                <span class="ml-1 text-sm font-medium text-gray-500 md:ml-2">Wallet Transactions</span>
+            </div>
+        </li>
+    </ol>
+</nav>
+
+<!-- Character Selection Dropdown -->
+<div class="mb-6">
+    <label for="character-actions" class="block text-sm font-medium text-gray-700 mb-2">Select Character</label>
+    <div class="relative inline-block text-left">
+        <div>
+            <button type="button" 
+                    class="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50" 
+                    id="character-actions-button" 
+                    aria-expanded="false" 
+                    aria-haspopup="true"
+                    onclick="toggleDropdown()">
+                {{ character.name or 'Select Character' }}
+                <svg class="-mr-1 h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
+                </svg>
+            </button>
+        </div>
+
+        <div class="absolute left-0 z-10 mt-2 w-56 origin-top-left rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none hidden" 
+             role="menu" 
+             aria-orientation="vertical" 
+             aria-labelledby="character-actions-button" 
+             tabindex="-1"
+             id="character-actions-menu">
+            <div class="py-1" role="none">
+                {% for character in characters %}
+                <a href="?character_id={{ character.character_id}}" class="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100 hover:text-gray-900" role="menuitem" tabindex="-1">
+                    <div class="flex items-center">
+                        <svg class="w-6 h-6 text-blue-500 mx-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                        </svg>
+                        {{ character.name }}
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block content %}
+<!-- Wallet Summary Cards -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+    <!-- Current Balance Card -->
+    <div class="bg-white overflow-hidden shadow rounded-lg">
+        <div class="p-5">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <div class="w-12 h-12 bg-green-500 rounded-md flex items-center justify-center">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+                        </svg>
+                    </div>
+                </div>
+                <div class="ml-5 w-0 flex-1">
+                    <dl>
+                        <dt class="text-sm font-medium text-gray-500 truncate">Current Balance</dt>
+                        <dd class="text-lg font-semibold text-gray-900">{{ "{:,.2f}".format(current_balance)}} ISK</dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Total Income Card -->
+    <div class="bg-white overflow-hidden shadow rounded-lg">
+        <div class="p-5">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <div class="w-12 h-12 bg-blue-500 rounded-md flex items-center justify-center">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                        </svg>
+                    </div>
+                </div>
+                <div class="ml-5 w-0 flex-1">
+                    <dl>
+                        <dt class="text-sm font-medium text-gray-500 truncate">Total Income</dt>
+                        <dd class="text-lg font-semibold text-gray-900">{{ "{:,.2f}".format(total_income) if total_income else '0.00' }} ISK</dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Total Expenses Card -->
+    <div class="bg-white overflow-hidden shadow rounded-lg">
+        <div class="p-5">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <div class="w-12 h-12 bg-red-500 rounded-md flex items-center justify-center">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"></path>
+                        </svg>
+                    </div>
+                </div>
+                <div class="ml-5 w-0 flex-1">
+                    <dl>
+                        <dt class="text-sm font-medium text-gray-500 truncate">Total Expenses</dt>
+                        <dd class="text-lg font-semibold text-gray-900">{{ "{:,.2f}".format(total_expenses) if total_expenses else '0.00' }} ISK</dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Net Profit Card -->
+    <div class="bg-white overflow-hidden shadow rounded-lg">
+        <div class="p-5">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <div class="w-12 h-12 bg-purple-500 rounded-md flex items-center justify-center">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                        </svg>
+                    </div>
+                </div>
+                <div class="ml-5 w-0 flex-1">
+                    <dl>
+                        <dt class="text-sm font-medium text-gray-500 truncate">Net Profit</dt>
+                        <dd class="text-lg font-semibold text-gray-900">
+                            <span class="{% if net_profit >= 0 %}text-green-600{% else %}text-red-600{% endif %}">
+                                {{ "{:,.2f}".format((net_profit)) }} ISK
+                            </span>
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Transaction Filters -->
+<div class="mb-6 bg-white shadow rounded-lg">
+    <div class="px-6 py-4 border-b border-gray-200">
+        <h2 class="text-lg font-semibold text-gray-900">Transaction Filters</h2>
+    </div>
+    <div class="px-6 py-4">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <!-- Date Range Filter -->
+            <div>
+                <label for="date-from" class="block text-sm font-medium text-gray-700 mb-1">From Date</label>
+                <input type="date" id="date-from" name="date_from" 
+                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+            <div>
+                <label for="date-to" class="block text-sm font-medium text-gray-700 mb-1">To Date</label>
+                <input type="date" id="date-to" name="date_to" 
+                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+            
+            <!-- Transaction Type Filter -->
+            <div>
+                <label for="transaction-type" class="block text-sm font-medium text-gray-700 mb-1">Transaction Type</label>
+                <select id="transaction-type" name="transaction_type" 
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="">All Types</option>
+                    <option value="buy">Buy Orders</option>
+                    <option value="sell">Sell Orders</option>
+                    <option value="bounty">Bounty Prizes</option>
+                    <option value="mission">Mission Rewards</option>
+                    <option value="broker">Broker Fees</option>
+                    <option value="contract">Contract</option>
+                    <option value="insurance">Insurance</option>
+                </select>
+            </div>
+            
+            <!-- Search Filter -->
+            <div>
+                <label for="search" class="block text-sm font-medium text-gray-700 mb-1">Search</label>
+                <input type="text" id="search" name="search" placeholder="Search transactions..." 
+                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+        </div>
+        
+        <div class="mt-4 flex justify-between">
+            <button onclick="applyFilters()" 
+                    class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                Apply Filters
+            </button>
+            <button onclick="clearFilters()" 
+                    class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500">
+                Clear Filters
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Transaction Type Filter Tabs -->
+<div class="mb-6">
+    <div class="border-b border-gray-200">
+        <nav class="-mb-px flex space-x-8" aria-label="Tabs">
+            <button onclick="filterTransactions('all')" 
+                    class="transaction-filter-tab active whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm border-blue-500 text-blue-600">
+                All Transactions ({{ all_transactions|length if all_transactions else 0 }})
+            </button>
+            <button onclick="filterTransactions('income')" 
+                    class="transaction-filter-tab whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300">
+                Income ({{ income_transactions|length if income_transactions else 0 }})
+            </button>
+            <button onclick="filterTransactions('expense')" 
+                    class="transaction-filter-tab whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300">
+                Expenses ({{ expense_transactions|length if expense_transactions else 0 }})
+            </button>
+            <button onclick="filterTransactions('recent')" 
+                    class="transaction-filter-tab whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300">
+                Recent ({{ recent_transactions|length if recent_transactions else 0 }})
+            </button>
+        </nav>
+    </div>
+</div>
+
+<!-- Transactions List -->
+<div class="bg-white shadow rounded-lg">
+    <div class="px-6 py-4 border-b border-gray-200">
+        <div class="flex justify-between items-center">
+            <h2 class="text-lg font-semibold text-gray-900">Wallet Transactions</h2>
+            <div class="flex space-x-2">
+                <button onclick="exportTransactions()" 
+                        class="px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500">
+                    Export CSV
+                </button>
+                <button onclick="refreshTransactions()" 
+                        class="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    Refresh
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="px-6 py-4">
+        <!-- Transaction List Container -->
+        <div class="space-y-4" id="transactions-container">
+            <!-- Example Transactions (Remove these when implementing your loop) -->
+            
+            <!-- Mission Reward Example -->
+             {% for transaction in wallet_transactions %}
+            <div class="transaction-item border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow {{ 'bg-green-50' if transaction.transaction_type == 'Income' else 'bg-red-50' }}" 
+                 data-type="{{transaction.transaction_type}}">
+                <div class="flex items-center justify-between">
+                    <div class="flex-1">
+                        <div class="flex items-center space-x-4">
+                            <div class="flex-shrink-0">
+                                <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center space-x-2">
+                                    <h3 class="text-lg font-medium text-gray-900 truncate">
+                                        {{ transaction.ref_type|replace('_', ' ')|title }}
+                                    </h3>
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ 'bg-green-100 text-green-800' if transaction.transaction_type == "Income" else 'bg-red-100 text-red-800'}}">
+                                        {{ transaction.transaction_type }}
+                                    </span>
+                                </div>
+                                <div class="mt-2 grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-600">
+                                    <div><span class="font-medium">Type:</span> <span class="ml-1">{{ transaction.ref_type }}</span></div>
+                                    <div><span class="font-medium">Date:</span> <span class="ml-1">{{ transaction.transaction_date }}</span></div>
+                                </div>
+                                <div class="mt-2 text-sm text-gray-600">
+                                    <span class="font-medium">Reason:</span> <span class="ml-1"></span>
+                                </div>
+                                <div class="mt-1 text-sm text-gray-600">
+                                    <span class="font-medium">Balance:</span> <span class="ml-1">{{ '{:20,.2f}'.format(transaction.balance) }} ISK</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex-shrink-0">
+                        <div class="text-right">
+                            <div class="text-lg font-semibold {{ 'text-green-600' if transaction.transaction_type == "Income" else 'text-red-600'  }}">{{ '{:20,.2f}'.format(transaction.amount) }} ISK</div>
+                            <div class="text-xs text-gray-500">Journal ID: {{ transaction.transaction_id }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+
+            
+            
+            {% if not transactions %}
+            <div class="text-center py-12">
+                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+                </svg>
+                <h3 class="mt-2 text-sm font-medium text-gray-900">No transactions found</h3>
+                <p class="mt-1 text-sm text-gray-500">This character doesn't have any wallet transactions at the moment.</p>
+            </div>
+            {% endif %}
+        </div>
+        
+        <!-- Pagination -->
+        {% if pagination %}
+        <div class="mt-6 flex items-center justify-between">
+            <div class="text-sm text-gray-700">
+                Showing {{ pagination.start }} to {{ pagination.end }} of {{ pagination.total }} results
+            </div>
+            <div class="flex space-x-2">
+                {% if pagination.has_prev %}
+                <button onclick="goToPage({{ pagination.prev_page }})" 
+                        class="px-3 py-1 bg-gray-300 text-gray-700 rounded hover:bg-gray-400">
+                    Previous
+                </button>
+                {% endif %}
+                {% if pagination.has_next %}
+                <button onclick="goToPage({{ pagination.next_page }})" 
+                        class="px-3 py-1 bg-gray-300 text-gray-700 rounded hover:bg-gray-400">
+                    Next
+                </button>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- EVE Wallet Links -->
+<div class="mt-8 bg-white shadow rounded-lg">
+    <div class="px-6 py-4 border-b border-gray-200">
+        <h2 class="text-lg font-semibold text-gray-900">EVE Wallet Resources</h2>
+    </div>
+    <div class="px-6 py-4">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <a href="https://esi.evetech.net/ui/#/Wallet/get_characters_character_id_wallet" 
+               target="_blank" 
+               class="flex items-center p-4 border border-gray-200 rounded-lg hover:border-light-blue-500 hover:shadow-md transition">
+                <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
+                    <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
+                    </svg>
+                </div>
+                <div>
+                    <div class="text-sm font-semibold text-gray-900">ESI API</div>
+                    <div class="text-xs text-gray-500">Wallet API documentation</div>
+                </div>
+            </a>
+            
+            <a href="https://evemarketer.com/" 
+               target="_blank" 
+               class="flex items-center p-4 border border-gray-200 rounded-lg hover:border-light-blue-500 hover:shadow-md transition">
+                <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mr-3">
+                    <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+                    </svg>
+                </div>
+                <div>
+                    <div class="text-sm font-semibold text-gray-900">EVE Marketer</div>
+                    <div class="text-xs text-gray-500">Market analysis & prices</div>
+                </div>
+            </a>
+            
+            <a href="https://evepraisal.com/" 
+               target="_blank" 
+               class="flex items-center p-4 border border-gray-200 rounded-lg hover:border-light-blue-500 hover:shadow-md transition">
+                <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center mr-3">
+                    <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                    </svg>
+                </div>
+                <div>
+                    <div class="text-sm font-semibold text-gray-900">EVEpraisal</div>
+                    <div class="text-xs text-gray-500">Item value calculator</div>
+                </div>
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block js %}
+<script>
+// Add any custom JavaScript for the EVE wallet transactions dashboard here
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('EVE Wallet Transactions Dashboard loaded for {{ character.name }}');
+});
+
+// Dropdown toggle function
+function toggleDropdown() {
+    const menu = document.getElementById('character-actions-menu');
+    const button = document.getElementById('character-actions-button');
+    
+    if (menu.classList.contains('hidden')) {
+        menu.classList.remove('hidden');
+        button.setAttribute('aria-expanded', 'true');
+    } else {
+        menu.classList.add('hidden');
+        button.setAttribute('aria-expanded', 'false');
+    }
+}
+
+// Close dropdown when clicking outside
+document.addEventListener('click', function(event) {
+    const menu = document.getElementById('character-actions-menu');
+    const button = document.getElementById('character-actions-button');
+    
+    if (!button.contains(event.target) && !menu.contains(event.target)) {
+        menu.classList.add('hidden');
+        button.setAttribute('aria-expanded', 'false');
+    }
+});
+
+// Close dropdown when pressing Escape key
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+        const menu = document.getElementById('character-actions-menu');
+        const button = document.getElementById('character-actions-button');
+        
+        menu.classList.add('hidden');
+        button.setAttribute('aria-expanded', 'false');
+    }
+});
+
+// Transaction filtering functionality
+function filterTransactions(type) {
+    const transactionItems = document.querySelectorAll('.transaction-item');
+    const tabs = document.querySelectorAll('.transaction-filter-tab');
+    
+    // Update tab states
+    tabs.forEach(tab => {
+        tab.classList.remove('active', 'border-blue-500', 'text-blue-600');
+        tab.classList.add('border-transparent', 'text-gray-500');
+    });
+    
+    // Activate selected tab
+    event.target.classList.add('active', 'border-blue-500', 'text-blue-600');
+    event.target.classList.remove('border-transparent', 'text-gray-500');
+    
+    // Filter transaction items
+    transactionItems.forEach(item => {
+        if (type === 'all' || item.dataset.type === type) {
+            item.style.display = 'block';
+        } else {
+            item.style.display = 'none';
+        }
+    });
+}
+
+// Apply filters function
+function applyFilters() {
+    const dateFrom = document.getElementById('date-from').value;
+    const dateTo = document.getElementById('date-to').value;
+    const transactionType = document.getElementById('transaction-type').value;
+    const search = document.getElementById('search').value;
+    
+    // Build query parameters
+    const params = new URLSearchParams();
+    if (dateFrom) params.append('date_from', dateFrom);
+    if (dateTo) params.append('date_to', dateTo);
+    if (transactionType) params.append('transaction_type', transactionType);
+    if (search) params.append('search', search);
+    
+    // Redirect with filters
+    window.location.href = '?' + params.toString();
+}
+
+// Clear filters function
+function clearFilters() {
+    document.getElementById('date-from').value = '';
+    document.getElementById('date-to').value = '';
+    document.getElementById('transaction-type').value = '';
+    document.getElementById('search').value = '';
+    
+    // Reset to show all transactions
+    filterTransactions('all');
+}
+
+// Export transactions function
+function exportTransactions() {
+    // This would typically make an API call to export data
+    console.log('Exporting transactions...');
+    alert('Export functionality would be implemented here');
+}
+
+// Refresh transactions function
+function refreshTransactions() {
+    window.location.reload();
+}
+
+// Pagination function
+function goToPage(page) {
+    const url = new URL(window.location);
+    url.searchParams.set('page', page);
+    window.location.href = url.toString();
+}
+</script>
+{% endblock %}

@@ -24,9 +24,12 @@ from masonite.notification.providers import NotificationProvider
 from masonite.validation.providers import ValidationProvider
 
 from app.providers import AppProvider
-from app.providers.DashboardProvider import DashboardProvider
-from plugins.users.UsersPluginProvider import UsersPluginProvider
-from plugins.library.PluginProvider import PluginProvider
+# from plugins.users.UsersPluginProvider import UsersPluginProvider
+from modulite.providers import DashboardProvider
+
+# Import plugins using importlib to handle hyphens in directory names
+import importlib.util
+import sys
 
 PROVIDERS = [
     FrameworkProvider,
@@ -51,6 +54,5 @@ PROVIDERS = [
     ORMProvider,
     AppProvider,
     DashboardProvider,
-    UsersPluginProvider,
-    PluginProvider,
+    # UsersPluginProvider,
 ]

@@ -12,6 +12,7 @@ class CreatePluginsTable(Migration):
             table.increments("id")
             table.string("name").unique()
             table.string("slug").unique()
+            table.string("repo").unique()
             table.string("description").nullable()
             table.decimal("price", 8, 2).default(0.00)
             table.decimal("rating", 2, 1).default(0.0)

@@ -1,0 +1,477 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}{{ character.name }} - EVE Character{% endblock %}
+
+{% block page_title %}
+EVE Character Dashboard 
+    {% if auth() %}
+    <a href="https://login.eveonline.com/v2/oauth/authorize?response_type=code&redirect_uri={{ config('eve.callback_url') }}&client_id={{ config('eve.client_id') }}&state={{ sign.sign(auth().id) }}&scope=esi-industry.read_character_jobs.v1%20esi-wallet.read_character_wallet.v1%20esi-wallet.read_corporation_wallets.v1%20esi-corporations.read_divisions.v1" 
+       target="_blank" 
+       class="inline-flex items-center">
+        
+        <button class="ml-2 px-3 py-1 bg-light-blue-600 text-white text-sm font-medium rounded hover:bg-light-blue-700 focus:outline-none focus:ring-2 focus:ring-light-blue-500">
+        <svg class="w-4 h-4 inline-block mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+        </svg>
+    {% else %}
+    please login
+    {%endif%}
+    Link Character
+</a>
+{% endblock %}
+
+{% block breadcrumbs %}
+<nav class="flex mb-6" aria-label="Breadcrumb">
+    <ol class="inline-flex items-center space-x-1 md:space-x-3">
+        <li class="inline-flex items-center">
+            <a href="/dashboard" class="inline-flex items-center text-sm font-medium text-gray-700 hover:text-light-blue-600">
+                <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path>
+                </svg>
+                Dashboard
+            </a>
+        </li>
+        <li>
+            <div class="flex items-center">
+                <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                </svg>
+                <span class="ml-1 text-sm font-medium text-gray-500 md:ml-2">EVE Character</span>
+            </div>
+        </li>
+    </ol>
+</nav>
+<!-- Include this script tag or install `@tailwindplus/elements` via npm: -->
+<!-- <script src="https://cdn.jsdelivr.net/npm/@tailwindplus/elements@1" type="module"></script> -->
+
+<!-- Tailwind Dropdown Example -->
+<div class="mb-6">
+    <label for="character-actions" class="block text-sm font-medium text-gray-700 mb-2">Character Actions</label>
+    <div class="relative inline-block text-left">
+        <div>
+            <button type="button" 
+                    class="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50" 
+                    id="character-actions-button" 
+                    aria-expanded="false" 
+                    aria-haspopup="true"
+                    onclick="toggleDropdown()">
+                Select Action
+                <svg class="-mr-1 h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
+                </svg>
+            </button>
+        </div>
+
+        <!-- characters -->
+
+        <div class="absolute left-0 z-10 mt-2 w-56 origin-top-left rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none hidden" 
+             role="menu" 
+             aria-orientation="vertical" 
+             aria-labelledby="character-actions-button" 
+             tabindex="-1"
+             id="character-actions-menu">
+            <div class="py-1" role="none">
+                {% for character in characters %}
+                <a href="?character_id={{ character.character_id}}" class="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100 hover:text-gray-900" role="menuitem" tabindex="-1">
+                    <div class="flex items-center">
+                       
+                        <svg class="w-6 h-6 text-blue-500 mx-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                        </svg>
+                        {{ character.name }}
+                    </div>
+                    
+                </a>
+                {% endfor%}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block content %}
+<!-- Character Profile Header -->
+<div class="bg-gradient-to-r from-indigo-900 via-purple-900 to-pink-900 rounded-lg shadow-xl overflow-hidden mb-8">
+    <div class="px-8 py-6">
+
+
+        <div class="flex flex-col md:flex-row items-center md:items-start space-y-4 md:space-y-0 md:space-x-8">
+            <!-- Character Portrait -->
+            <div class="flex-shrink-0">
+                <img src="{{ portrait_url }}" alt="{{ character['CharacterName'] }}" class="w-32 h-32 rounded-lg border-4 border-white shadow-lg">
+            </div>
+            
+            <!-- Character Info -->
+            <div class="flex-1 text-white text-center md:text-left">
+                <h1 class="text-4xl font-bold mb-2">{{ character.name }}</h1>
+                
+                <!-- Corporation & Alliance -->
+                <div class="space-y-2 mb-4">
+                    {% if corporation %}
+                    <div class="flex items-center justify-center md:justify-start space-x-2">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"></path>
+                        </svg>
+                        <span class="text-lg">{{ corporation.name }}</span>
+                    </div>
+                    {% endif %}
+                    
+                    {% if alliance %}
+                    <div class="flex items-center justify-center md:justify-start space-x-2">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M3 6a3 3 0 013-3h10a1 1 0 01.8 1.6L14.25 8l2.55 3.4A1 1 0 0116 13H6a1 1 0 00-1 1v3a1 1 0 11-2 0V6z" clip-rule="evenodd"></path>
+                        </svg>
+                        <span class="text-lg">{{ alliance.name }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Character Stats Row -->
+                <div class="flex flex-wrap gap-4 justify-center md:justify-start">
+                    <div class="bg-white bg-opacity-20 rounded-lg px-4 py-2">
+                        <div class="text-xs text-gray-200">Character ID</div>
+                        <div class="text-sm font-semibold">{{ character.character_id }}</div>
+                    </div>
+                    
+                    {% if character.birthday %}
+                    <div class="bg-white bg-opacity-20 rounded-lg px-4 py-2">
+                        <div class="text-xs text-gray-200">Birthday</div>
+                        <div class="text-sm font-semibold">{{ character.birthday[:10] }}</div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if character.security_status is defined %}
+                    <div class="bg-white bg-opacity-20 rounded-lg px-4 py-2">
+                        <div class="text-xs text-gray-200">Security Status</div>
+                        <div class="text-sm font-semibold">
+                            {% if character.security_status >= 0 %}
+                            <span class="text-green-300">{{ "%.2f"|format(character.security_status) }}</span>
+                            {% else %}
+                            <span class="text-red-300">{{ "%.2f"|format(character.security_status) }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if character.gender %}
+                    <div class="bg-white bg-opacity-20 rounded-lg px-4 py-2">
+                        <div class="text-xs text-gray-200">Gender</div>
+                        <div class="text-sm font-semibold">{{ character.gender }}</div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Stats Cards -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <!-- Character Info Card -->
+    <div class="bg-white overflow-hidden shadow rounded-lg">
+        <div class="p-5">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <div class="w-12 h-12 bg-purple-500 rounded-md flex items-center justify-center">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                        </svg>
+                    </div>
+                </div>
+                <div class="ml-5 w-0 flex-1">
+                    <dl>
+                        <dt class="text-sm font-medium text-gray-500 truncate">Race</dt>
+                        <dd class="text-lg font-semibold text-gray-900">{{ config("eve.race")[character.race_id] or 'Unknown' }}</dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bloodline Card -->
+    <div class="bg-white overflow-hidden shadow rounded-lg">
+        <div class="p-5">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <div class="w-12 h-12 bg-blue-500 rounded-md flex items-center justify-center">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"></path>
+                        </svg>
+                    </div>
+                </div>
+                <div class="ml-5 w-0 flex-1">
+                    <dl>
+                        <dt class="text-sm font-medium text-gray-500 truncate">Bloodline</dt>
+                        <dd class="text-lg font-semibold text-gray-900">{{ config("eve.bloodline")[character.bloodline_id] or 'Unknown' }}</dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Ancestry Card -->
+    <div class="bg-white overflow-hidden shadow rounded-lg">
+        <div class="p-5">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <div class="w-12 h-12 bg-indigo-500 rounded-md flex items-center justify-center">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                        </svg>
+                    </div>
+                </div>
+                <div class="ml-5 w-0 flex-1">
+                    <dl>
+                        <dt class="text-sm font-medium text-gray-500 truncate">Ancestry</dt>
+                        <dd class="text-lg font-semibold text-gray-900">{{ character.ancestry_id or 'Unknown' }}</dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Alliance Faction Card -->
+    <div class="bg-white overflow-hidden shadow rounded-lg">
+        <div class="p-5">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <div class="w-12 h-12 bg-pink-500 rounded-md flex items-center justify-center">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                </div>
+                <div class="ml-5 w-0 flex-1">
+                    <dl>
+                        <dt class="text-sm font-medium text-gray-500 truncate">Faction</dt>
+                        <dd class="text-lg font-semibold text-gray-900">{{ config("eve.faction")[character.faction_id] or 'None' }}</dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Character Details -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+    <!-- Character Information Card -->
+    <div class="bg-white shadow rounded-lg">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <h2 class="text-lg font-semibold text-gray-900">Character Information</h2>
+        </div>
+        <div class="px-6 py-4">
+            <dl class="space-y-4">
+                <div class="flex justify-between">
+                    <dt class="text-sm font-medium text-gray-500">Name</dt>
+                    <dd class="text-sm text-gray-900 font-semibold">{{ character.name }}</dd>
+                </div>
+                <div class="flex justify-between">
+                    <dt class="text-sm font-medium text-gray-500">Character ID</dt>
+                    <dd class="text-sm text-gray-900">{{ character.character_id }}</dd>
+                </div>
+                {% if character.description %}
+                <div>
+                    <dt class="text-sm font-medium text-gray-500 mb-1">Description</dt>
+                    <dd class="text-sm text-gray-900">{{ character.description }}</dd>
+                </div>
+                {% endif %}
+                {% if character.birthday %}
+                <div class="flex justify-between">
+                    <dt class="text-sm font-medium text-gray-500">Birthday</dt>
+                    <dd class="text-sm text-gray-900">{{ character.birthday }}</dd>
+                </div>
+                {% endif %}
+                {% if character.gender %}
+                <div class="flex justify-between">
+                    <dt class="text-sm font-medium text-gray-500">Gender</dt>
+                    <dd class="text-sm text-gray-900">{{ character.gender }}</dd>
+                </div>
+                {% endif %}
+                {% if character.security_status is defined %}
+                <div class="flex justify-between">
+                    <dt class="text-sm font-medium text-gray-500">Security Status</dt>
+                    <dd class="text-sm font-semibold">
+                        {% if character.security_status >= 0 %}
+                        <span class="text-green-600">{{ "%.2f"|format(character.security_status) }}</span>
+                        {% else %}
+                        <span class="text-red-600">{{ "%.2f"|format(character.security_status) }}</span>
+                        {% endif %}
+                    </dd>
+                </div>
+                {% endif %}
+            </dl>
+        </div>
+    </div>
+    
+    <!-- Corporation & Alliance Card -->
+    <div class="bg-white shadow rounded-lg">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <h2 class="text-lg font-semibold text-gray-900">Corporation & Alliance</h2>
+        </div>
+        <div class="px-6 py-4">
+            {% if corporation %}
+            <div class="mb-6">
+                <div class="flex items-center mb-3">
+                    <img src="https://images.evetech.net/corporations/{{ corporation.corporation_id }}/logo?size=128" 
+                         alt="{{ corporation.name }}"
+                         class="w-12 h-12 rounded mr-3">
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-900">{{ corporation.name }}</h3>
+                        <p class="text-sm text-gray-500">Corporation</p>
+                    </div>
+                </div>
+                <dl class="space-y-2">
+                    <div class="flex justify-between">
+                        <dt class="text-sm font-medium text-gray-500">Ticker</dt>
+                        <dd class="text-sm text-gray-900 font-mono">{{ corporation.ticker }}</dd>
+                    </div>
+                    <div class="flex justify-between">
+                        <dt class="text-sm font-medium text-gray-500">Members</dt>
+                        <dd class="text-sm text-gray-900">{{ "{:,}".format(corporation.member_count) if corporation.member_count else 'Unknown' }}</dd>
+                    </div>
+                    {% if corporation.date_founded %}
+                    <div class="flex justify-between">
+                        <dt class="text-sm font-medium text-gray-500">Founded</dt>
+                        <dd class="text-sm text-gray-900">{{ corporation.date_founded[:10] }}</dd>
+                    </div>
+                    {% endif %}
+                </dl>
+            </div>
+            {% endif %}
+            
+            {% if alliance %}
+            <div class="pt-6 border-t border-gray-200">
+                <div class="flex items-center mb-3">
+                    <img src="https://images.evetech.net/alliances/{{ alliance.alliance_id }}/logo?size=64" 
+                         alt="{{ alliance.name }}" 
+                         class="w-12 h-12 rounded mr-3">
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-900">{{ alliance.name }}</h3>
+                        <p class="text-sm text-gray-500">Alliance</p>
+                    </div>
+                </div>
+                <dl class="space-y-2">
+                    <div class="flex justify-between">
+                        <dt class="text-sm font-medium text-gray-500">Ticker</dt>
+                        <dd class="text-sm text-gray-900 font-mono">{{ alliance.ticker }}</dd>
+                    </div>
+                    {% if alliance.date_founded %}
+                    <div class="flex justify-between">
+                        <dt class="text-sm font-medium text-gray-500">Founded</dt>
+                        <dd class="text-sm text-gray-900">{{ alliance.date_founded[:10] }}</dd>
+                    </div>
+                    {% endif %}
+                </dl>
+            </div>
+            {% endif %}
+            
+            {% if not corporation %}
+            <div class="text-center py-8">
+                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <p class="mt-2 text-sm text-gray-500">No corporation data available</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Quick Links -->
+<div class="bg-white shadow rounded-lg">
+    <div class="px-6 py-4 border-b border-gray-200">
+        <h2 class="text-lg font-semibold text-gray-900">EVE Links</h2>
+    </div>
+    <div class="px-6 py-4">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <a href="https://zkillboard.com/character/{{ character_id }}/" 
+               target="_blank" 
+               class="flex items-center p-4 border border-gray-200 rounded-lg hover:border-light-blue-500 hover:shadow-md transition">
+                <div class="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center mr-3">
+                    <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                    </svg>
+                </div>
+                <div>
+                    <div class="text-sm font-semibold text-gray-900">zKillboard</div>
+                    <div class="text-xs text-gray-500">View kills & losses</div>
+                </div>
+            </a>
+            
+            <a href="https://evewho.com/character/{{ character_id }}" 
+               target="_blank" 
+               class="flex items-center p-4 border border-gray-200 rounded-lg hover:border-light-blue-500 hover:shadow-md transition">
+                <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
+                    <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                </div>
+                <div>
+                    <div class="text-sm font-semibold text-gray-900">EVE Who</div>
+                    <div class="text-xs text-gray-500">Character history</div>
+                </div>
+            </a>
+            
+            <a href="https://esi.evetech.net/ui/#/Character/get_characters_character_id" 
+               target="_blank" 
+               class="flex items-center p-4 border border-gray-200 rounded-lg hover:border-light-blue-500 hover:shadow-md transition">
+                <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mr-3">
+                    <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
+                    </svg>
+                </div>
+                <div>
+                    <div class="text-sm font-semibold text-gray-900">ESI API</div>
+                    <div class="text-xs text-gray-500">API documentation</div>
+                </div>
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block js %}
+<script>
+// Add any custom JavaScript for the EVE character dashboard here
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('EVE Character Dashboard loaded for {{ character.name }}');
+});
+
+// Dropdown toggle function
+function toggleDropdown() {
+    const menu = document.getElementById('character-actions-menu');
+    const button = document.getElementById('character-actions-button');
+    
+    if (menu.classList.contains('hidden')) {
+        menu.classList.remove('hidden');
+        button.setAttribute('aria-expanded', 'true');
+    } else {
+        menu.classList.add('hidden');
+        button.setAttribute('aria-expanded', 'false');
+    }
+}
+
+// Close dropdown when clicking outside
+document.addEventListener('click', function(event) {
+    const menu = document.getElementById('character-actions-menu');
+    const button = document.getElementById('character-actions-button');
+    
+    if (!button.contains(event.target) && !menu.contains(event.target)) {
+        menu.classList.add('hidden');
+        button.setAttribute('aria-expanded', 'false');
+    }
+});
+
+// Close dropdown when pressing Escape key
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+        const menu = document.getElementById('character-actions-menu');
+        const button = document.getElementById('character-actions-button');
+        
+        menu.classList.add('hidden');
+        button.setAttribute('aria-expanded', 'false');
+    }
+});
+</script>
+{% endblock %}

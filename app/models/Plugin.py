@@ -7,4 +7,4 @@ from masonite.authentication import Authenticates
 class Plugin(Model):
     """User Model."""
 
-    __fillable__ = ["name", "slug", "description", "price", "rating" "version", "author", "repository"]
+    __fillable__ = ["name", "slug", "description", "repo", "price", "rating" "version", "author", "repository"]

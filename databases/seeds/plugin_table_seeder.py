@@ -13,6 +13,7 @@ class PluginTableSeeder(Seeder):
                 "name": "User Management",
                 "slug": "user-management",
                 "description": "Manage users accounts",
+                "repo": "josephmancuso/dashboard-user-management",
                 "rating": 4.5,
                 "price": 0.00,
                 "version": "1.0.0",

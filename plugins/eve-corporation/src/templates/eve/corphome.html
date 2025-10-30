@@ -1,0 +1,516 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}{{ corporation.name }} - Corporation Management{% endblock %}
+
+{% block page_title %}
+Corporation Management
+    {% if auth() %}
+    <a href="{{ '?corporation_id='+request().input('corporation_id')+'&refresh=1' if request().input('corporation_id') else '?refresh=1' }}" 
+       target="" 
+       class="inline-flex items-center">
+        
+        <button class="ml-2 px-3 py-1 bg-light-blue-600 text-white text-sm font-medium rounded hover:bg-light-blue-700 focus:outline-none focus:ring-2 focus:ring-light-blue-500">
+        <svg class="w-4 h-4 inline-block mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+        </svg>
+    {% else %}
+    please login
+    {%endif%}
+    Refresh Data
+</a>
+{% endblock %}
+
+{% block breadcrumbs %}
+<nav class="flex mb-6" aria-label="Breadcrumb">
+    <ol class="inline-flex items-center space-x-1 md:space-x-3">
+        <li class="inline-flex items-center">
+            <a href="/dashboard" class="inline-flex items-center text-sm font-medium text-gray-700 hover:text-light-blue-600">
+                <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path>
+                </svg>
+                Dashboard
+            </a>
+        </li>
+        <li>
+            <div class="flex items-center">
+                <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                </svg>
+                <span class="ml-1 text-sm font-medium text-gray-500 md:ml-2">Corporation Management</span>
+            </div>
+        </li>
+    </ol>
+</nav>
+
+<!-- Corporation Selection Dropdown -->
+<div class="mb-6">
+    <label for="corporation-actions" class="block text-sm font-medium text-gray-700 mb-2">Select Corporation</label>
+    <div class="relative inline-block text-left">
+        <div>
+            <button type="button" 
+                    class="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50" 
+                    id="corporation-actions-button" 
+                    aria-expanded="false" 
+                    aria-haspopup="true"
+                    onclick="toggleDropdown()">
+                {{ corporation.name or 'Select Corporation' }}
+                <svg class="-mr-1 h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
+                </svg>
+            </button>
+        </div>
+
+        <div class="absolute left-0 z-10 mt-2 w-56 origin-top-left rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none hidden" 
+             role="menu" 
+             aria-orientation="vertical" 
+             aria-labelledby="corporation-actions-button" 
+             tabindex="-1"
+             id="corporation-actions-menu">
+            <div class="py-1" role="none">
+                {% for corp in corporations %}
+                <a href="?corporation_id={{ corp.corporation_id}}" class="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100 hover:text-gray-900" role="menuitem" tabindex="-1">
+                    <div class="flex items-center">
+                        <svg class="w-6 h-6 text-blue-500 mx-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                        </svg>
+                        {{ corp.name }}
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block content %}
+<!-- Corporation Overview Cards -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+    <!-- Corporation Wallet Balance Card -->
+    <div class="bg-white overflow-hidden shadow rounded-lg">
+        <div class="p-5">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <div class="w-12 h-12 bg-green-500 rounded-md flex items-center justify-center">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+                        </svg>
+                    </div>
+                </div>
+                <div class="ml-5 w-0 flex-1">
+                    <dl>
+                        <dt class="text-sm font-medium text-gray-500 truncate">Master Wallet Balance</dt>
+                        <dd class="text-lg font-semibold text-gray-900">{{ "{:,.2f}".format(master_balance) }} ISK</dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Total Balance Card -->
+    <div class="bg-white overflow-hidden shadow rounded-lg">
+        <div class="p-5">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <div class="w-12 h-12 bg-blue-500 rounded-md flex items-center justify-center">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                        </svg>
+                    </div>
+                </div>
+                <div class="ml-5 w-0 flex-1">
+                    <dl>
+                        <dt class="text-sm font-medium text-gray-500 truncate">Total Balance</dt>
+                        <dd class="text-lg font-semibold text-gray-900">{{ "{:,.2f}".format(total_balance) }} ISK</dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Member Count Card -->
+    <div class="bg-white overflow-hidden shadow rounded-lg">
+        <div class="p-5">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <div class="w-12 h-12 bg-blue-500 rounded-md flex items-center justify-center">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                        </svg>
+                    </div>
+                </div>
+                <div class="ml-5 w-0 flex-1">
+                    <dl>
+                        <dt class="text-sm font-medium text-gray-500 truncate">Active Members</dt>
+                        <dd class="text-lg font-semibold text-gray-900">{{ corporation.member_count }}</dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Active Industry Jobs Card -->
+    <div class="bg-white overflow-hidden shadow rounded-lg">
+        <div class="p-5">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <div class="w-12 h-12 bg-yellow-500 rounded-md flex items-center justify-center">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                        </svg>
+                    </div>
+                </div>
+                <div class="ml-5 w-0 flex-1">
+                    <dl>
+                        <dt class="text-sm font-medium text-gray-500 truncate">Active Industry Jobs</dt>
+                        <dd class="text-lg font-semibold text-gray-900">{{ active_industry_jobs if active_industry_jobs else '0' }}</dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Corporation Standing Card -->
+    <div class="bg-white overflow-hidden shadow rounded-lg">
+        <div class="p-5">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <div class="w-12 h-12 bg-purple-500 rounded-md flex items-center justify-center">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                </div>
+                <div class="ml-5 w-0 flex-1">
+                    <dl>
+                        <dt class="text-sm font-medium text-gray-500 truncate">Corp Standing</dt>
+                        <dd class="text-lg font-semibold text-gray-900">{{ corp_standing if corp_standing else 'N/A' }}</dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Corporation Information Section -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+    <!-- Corporation Details -->
+    <div class="bg-white shadow rounded-lg">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <h2 class="text-lg font-semibold text-gray-900">Corporation Information</h2>
+        </div>
+        <div class="px-6 py-4">
+            <dl class="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
+                <div>
+                    <dt class="text-sm font-medium text-gray-500">Corporation Name</dt>
+                    <dd class="mt-1 text-sm text-gray-900">{{ corporation.name or 'N/A' }}</dd>
+                </div>
+                <div>
+                    <dt class="text-sm font-medium text-gray-500">Ticker</dt>
+                    <dd class="mt-1 text-sm text-gray-900">{{ corporation.ticker or 'N/A' }}</dd>
+                </div>
+                <div>
+                    <dt class="text-sm font-medium text-gray-500">Alliance</dt>
+                    <dd class="mt-1 text-sm text-gray-900">{{ corporation.alliance_name or 'Independent' }}</dd>
+                </div>
+                <div>
+                    <dt class="text-sm font-medium text-gray-500">Founded</dt>
+                    <dd class="mt-1 text-sm text-gray-900">{{ corporation.date_founded or 'N/A' }}</dd>
+                </div>
+                <div class="sm:col-span-2">
+                    <dt class="text-sm font-medium text-gray-500">Description</dt>
+                    <dd class="mt-1 text-sm text-gray-900">{{ corporation.description or 'No description available' }}</dd>
+                </div>
+            </dl>
+        </div>
+    </div>
+
+    <!-- Corporation Wallet Summary -->
+    <div class="bg-white shadow rounded-lg">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <h2 class="text-lg font-semibold text-gray-900">Division Balance Summary</h2>
+        </div>
+        <div class="px-6 py-4">
+            <div class="space-y-4">
+                {% for division in divisions%}
+                <div class="flex justify-between items-center">
+                    <span class="text-sm font-medium text-gray-500">{{ division.name }} Balance</span>
+                    <span class="text-lg font-semibold text-gray-900">{{ "{:,.2f}".format(division.amount) }} ISK</span>
+                </div>
+                {%endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Management Tabs -->
+<div class="mb-6">
+    <div class="border-b border-gray-200">
+        <nav class="-mb-px flex space-x-8" aria-label="Tabs">
+            <button onclick="showTab('members')" 
+                    class="management-tab active whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm border-blue-500 text-blue-600">
+                Members ({{ member_count if member_count else 0 }})
+            </button>
+            <button onclick="showTab('industry')" 
+                    class="management-tab whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300">
+                Industry Jobs ({{ active_industry_jobs if active_industry_jobs else 0 }})
+            </button>
+            <button onclick="showTab('wallet')" 
+                    class="management-tab whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300">
+                Wallet Transactions
+            </button>
+            <button onclick="showTab('assets')" 
+                    class="management-tab whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300">
+                Assets
+            </button>
+        </nav>
+    </div>
+</div>
+
+<!-- Members Management Section -->
+<div id="members-tab" class="management-content">
+    <div class="bg-white shadow rounded-lg">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <div class="flex justify-between items-center">
+                <h2 class="text-lg font-semibold text-gray-900">Corporation Members</h2>
+                <div class="flex space-x-2">
+                    <button class="px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500">
+                        Add Member
+                    </button>
+                    <button class="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        Export List
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="px-6 py-4">
+            <div class="space-y-4">
+                <!-- Member List Placeholder -->
+                <div class="text-center py-12">
+                    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                    </svg>
+                    <h3 class="mt-2 text-sm font-medium text-gray-900">No members found</h3>
+                    <p class="mt-1 text-sm text-gray-500">Member data will be displayed here when available.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Industry Jobs Section -->
+<div id="industry-tab" class="management-content hidden">
+    <div class="bg-white shadow rounded-lg">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <div class="flex justify-between items-center">
+                <h2 class="text-lg font-semibold text-gray-900">Corporation Industry Jobs</h2>
+                <div class="flex space-x-2">
+                    <button class="px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500">
+                        New Job
+                    </button>
+                    <button class="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        Refresh
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="px-6 py-4">
+            <div class="space-y-4">
+                <!-- Industry Jobs Placeholder -->
+                <div class="text-center py-12">
+                    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                    </svg>
+                    <h3 class="mt-2 text-sm font-medium text-gray-900">No industry jobs found</h3>
+                    <p class="mt-1 text-sm text-gray-500">Industry job data will be displayed here when available.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Wallet Transactions Section -->
+<div id="wallet-tab" class="management-content hidden">
+    <div class="bg-white shadow rounded-lg">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <div class="flex justify-between items-center">
+                <h2 class="text-lg font-semibold text-gray-900">Corporation Wallet Transactions</h2>
+                <div class="flex space-x-2">
+                    <button class="px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500">
+                        Export CSV
+                    </button>
+                    <button class="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        Refresh
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="px-6 py-4">
+            <div class="space-y-4">
+                <!-- Wallet Transactions Placeholder -->
+                <div class="text-center py-12">
+                    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+                    </svg>
+                    <h3 class="mt-2 text-sm font-medium text-gray-900">No wallet transactions found</h3>
+                    <p class="mt-1 text-sm text-gray-500">Wallet transaction data will be displayed here when available.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Assets Section -->
+<div id="assets-tab" class="management-content hidden">
+    <div class="bg-white shadow rounded-lg">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <div class="flex justify-between items-center">
+                <h2 class="text-lg font-semibold text-gray-900">Corporation Assets</h2>
+                <div class="flex space-x-2">
+                    <button class="px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500">
+                        Export Assets
+                    </button>
+                    <button class="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        Refresh
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="px-6 py-4">
+            <div class="space-y-4">
+                <!-- Assets Placeholder -->
+                <div class="text-center py-12">
+                    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                    </svg>
+                    <h3 class="mt-2 text-sm font-medium text-gray-900">No assets found</h3>
+                    <p class="mt-1 text-sm text-gray-500">Asset data will be displayed here when available.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Links -->
+<div class="mt-8 bg-white shadow rounded-lg">
+    <div class="px-6 py-4 border-b border-gray-200">
+        <h2 class="text-lg font-semibold text-gray-900">Corporation Resources</h2>
+    </div>
+    <div class="px-6 py-4">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <a href="https://esi.evetech.net/ui/#/Corporation/get_corporations_corporation_id" 
+               target="_blank" 
+               class="flex items-center p-4 border border-gray-200 rounded-lg hover:border-light-blue-500 hover:shadow-md transition">
+                <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
+                    <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
+                    </svg>
+                </div>
+                <div>
+                    <div class="text-sm font-semibold text-gray-900">ESI API</div>
+                    <div class="text-xs text-gray-500">Corporation API documentation</div>
+                </div>
+            </a>
+            
+            <a href="https://evemarketer.com/" 
+               target="_blank" 
+               class="flex items-center p-4 border border-gray-200 rounded-lg hover:border-light-blue-500 hover:shadow-md transition">
+                <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mr-3">
+                    <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+                    </svg>
+                </div>
+                <div>
+                    <div class="text-sm font-semibold text-gray-900">EVE Marketer</div>
+                    <div class="text-xs text-gray-500">Market analysis & prices</div>
+                </div>
+            </a>
+            
+            <a href="https://zkillboard.com/" 
+               target="_blank" 
+               class="flex items-center p-4 border border-gray-200 rounded-lg hover:border-light-blue-500 hover:shadow-md transition">
+                <div class="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center mr-3">
+                    <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                    </svg>
+                </div>
+                <div>
+                    <div class="text-sm font-semibold text-gray-900">zKillboard</div>
+                    <div class="text-xs text-gray-500">Killboard & statistics</div>
+                </div>
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block js %}
+<script>
+// Add any custom JavaScript for the corporation management dashboard here
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Corporation Management Dashboard loaded for {{ corporation.name }}');
+});
+
+// Dropdown toggle function
+function toggleDropdown() {
+    const menu = document.getElementById('corporation-actions-menu');
+    const button = document.getElementById('corporation-actions-button');
+    
+    if (menu.classList.contains('hidden')) {
+        menu.classList.remove('hidden');
+        button.setAttribute('aria-expanded', 'true');
+    } else {
+        menu.classList.add('hidden');
+        button.setAttribute('aria-expanded', 'false');
+    }
+}
+
+// Close dropdown when clicking outside
+document.addEventListener('click', function(event) {
+    const menu = document.getElementById('corporation-actions-menu');
+    const button = document.getElementById('corporation-actions-button');
+    
+    if (!button.contains(event.target) && !menu.contains(event.target)) {
+        menu.classList.add('hidden');
+        button.setAttribute('aria-expanded', 'false');
+    }
+});
+
+// Close dropdown when pressing Escape key
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+        const menu = document.getElementById('corporation-actions-menu');
+        const button = document.getElementById('corporation-actions-button');
+        
+        menu.classList.add('hidden');
+        button.setAttribute('aria-expanded', 'false');
+    }
+});
+
+// Tab management functionality
+function showTab(tabName) {
+    // Hide all management content
+    const allTabs = document.querySelectorAll('.management-content');
+    allTabs.forEach(tab => {
+        tab.classList.add('hidden');
+    });
+    
+    // Remove active class from all tabs
+    const allTabButtons = document.querySelectorAll('.management-tab');
+    allTabButtons.forEach(button => {
+        button.classList.remove('active', 'border-blue-500', 'text-blue-600');
+        button.classList.add('border-transparent', 'text-gray-500');
+    });
+    
+    // Show selected tab
+    const selectedTab = document.getElementById(tabName + '-tab');
+    if (selectedTab) {
+        selectedTab.classList.remove('hidden');
+    }
+    
+    // Activate selected tab button
+    event.target.classList.add('active', 'border-blue-500', 'text-blue-600');
+    event.target.classList.remove('border-transparent', 'text-gray-500');
+}
+</script>
+{% endblock %}
